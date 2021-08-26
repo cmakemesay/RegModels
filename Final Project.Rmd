@@ -12,6 +12,9 @@ knitr::opts_chunk$set(echo = TRUE,tidy.opts = list(width.cutoff = 60), tidy = TR
 # Analyzing fuel efficiency for automatic and manual transmission car models.
 
 ## Executive summary
+In this study we analyzed the impact of a manual transmission over fuel efficiency in cars. We used our database with 32 car models from 73/74 to answer a question that many of our readers ask us. 
+Fitting a model with the transmission type, weight, horsepower and number of cylinders as predictors, we could not find a statistically significant relationship between transmission type and fuel efficiency as measured in miles per gallon.
+Then again, the study can be repeated with a better database that includes more vehicles.
 
 ## Introduction
 Our work in the *Motor Trend* magazine includes analyzing technical details about automobiles. One question of interest to our readers is the efficiency of cars, as measures in miles per gallon, since fuel is a considerable cost of maintaining a vehicle. In this report we aim to discuss whether automatic cars are as efficient as those with manual transmission.
@@ -21,6 +24,8 @@ The data was extracted from our own collection, including 32 different 1973 and 
 
 ```{r}
 data <- mtcars
+data$am <- as.factor(data$am)
+data$cyl <- as.factor(data$cyl)
 names(data)
 ```
 
@@ -31,7 +36,7 @@ We tested various models and how additional predictors offered more information.
 summary(lm(mpg~am+hp+wt+cyl,data))$coef[2,]
 confint(lm(mpg~am+hp+wt+cyl,data))[2,]
 ```
-While there seems to be a small increase in fuel efficiency (1.48 miles per gallon) for manual transmission cars, the confidence interval includes 0. The p-value is 0.31, meaning there is a 31% chance of getting this result if we consider that there is no influence of the predictor on the outcome.
+While there seems to be a small increase in fuel efficiency (1.8 miles per gallon) for manual transmission cars, the confidence interval includes 0. The p-value is 0.21, meaning there is a 21% chance of getting this result if we consider that there is no influence of the predictor on the outcome.
 
 
 ## Conclusion
@@ -43,7 +48,6 @@ The entries indicate whether the transmission is automatic (0) or manual (1) in 
 ```{r}
 library(ggplot2)
 
-data$am <- as.factor(data$am)
 
 g <- ggplot(data=data,aes(y=mpg,x=am,fill=am))
 g + geom_boxplot() + scale_fill_brewer(palette='Blues') + scale_x_discrete(name='Transmission',labels=c('0'='automatic','1'='manual'))
@@ -62,7 +66,7 @@ This preliminary model indicates there is a significant effect of transmission o
 mdl <- lm(mpg~am+cyl+hp+wt,data)
 summary(mdl)$coef
 ```
-Now we see that for a fixed number of cylinders, horsepower and weight, the change from automatic to manual transmission might increase the fuel efficiency by 1.5 miles per gallon. We can create several models and test the additional information each predictor adds to the model.
+Now we see that for a fixed number of cylinders, horsepower and weight, the change from automatic to manual transmission might increase the fuel efficiency by 1.8 miles per gallon. We can create several models and test the additional information each predictor adds to the model.
 
 ```{r}
 mdl0 <- lm(mpg~am+cyl,data)
@@ -90,11 +94,11 @@ par(mfrow=c(2,2))
 plot(mdl2)
 ```
 
-We see that there are some models influencing the model, such as *Toyota Corolla*, *Toyota Corona*, *Chrysler Imperial* and *Fiat 128*. We can try to remove those points and evaluate the effect over the model.
+We see that there are some models influencing the model, such as *Toyota Corolla*, *Toyota Corona*, *Chrysler Imperial* and *Datsuo 710*. We can try to remove those points and evaluate the effect over the model.
 
 ```{r}
  data$car <- rownames(data)
-data1 <- data[!(data$car %in% c('Toyota Corolla','Toyota Corona','Chrysler Imperial','Fiat 128')),]
+data1 <- data[!(data$car %in% c('Toyota Corolla','Toyota Corona','Chrysler Imperial','Datsuo 710')),]
 mdlnew <- lm(mpg~am+cyl+hp+wt,data1)
 confint(mdlnew)
 
